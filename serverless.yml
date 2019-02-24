@@ -22,7 +22,7 @@ provider:
   runtime: nodejs8.10
 
 functions:
-  hello:
+  eden:
     handler: index.handler
     events:
       - http: POST /
