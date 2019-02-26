@@ -9,3 +9,33 @@ Eden uses standard HTTP headers for content negotiation. `Accept` defines the re
 ```bash
 curl -H "Content-Type: application/yaml" --data-binary "@serverless.yml" -H "Accept: application/edn" https://2drrpzm6i9.execute-api.us-east-1.amazonaws.com/dev
 ```
+
+Converts from:
+
+```yml
+service: eden
+provider:
+  name: aws
+  runtime: nodejs8.10
+functions:
+  eden:
+    handler: index.handler
+    events:
+      - http: POST /
+      - http: 'POST {proxy+}'
+plugins:
+  - serverless-offline
+```
+
+to 
+
+
+```edn
+{"service" "eden",
+ "provider" {"name" "aws", "runtime" "nodejs8.10"},
+ "functions"
+ {"eden"
+  {"handler" "index.handler",
+   "events" [{"http" "POST /"} {"http" "POST {proxy+}"}]}},
+ "plugins" ["serverless-offline"]}
+```
