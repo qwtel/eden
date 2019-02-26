@@ -42,11 +42,12 @@ exports.stringifyYAML = function stringifyYAML(obj) {
     return yaml.safeDump(obj);
 }
 
-exports.parseXML = function parseXML(stream) {
+exports.parseXML = async function parseXML(stream) {
     const parseString = promisify(require('xml2js').parseString);
-    return parseString(stream, {
+    return await parseString(stream, {
         explicitRoot: false,
         explicitArray: false,
+        ignoreAttrs: true,
     });
 }
 

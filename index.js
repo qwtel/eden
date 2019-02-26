@@ -2,8 +2,6 @@
 
 const serverless = require('serverless-http');
 const express = require('express');
-const bodyParser = require('body-parser');
-const multer = require('multer');
 
 const {
   parseJSON, stringifyJSON,
@@ -14,11 +12,8 @@ const {
 } = require('./eden.js');
 
 const app = express();
-const upload = multer();
 
 const log = process.env.DEBUG ? console.log.bind(console) : _ => _;
-
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(async (req, _, next) => {
   if (req.is('application/json')) {
@@ -36,16 +31,22 @@ app.use(async (req, _, next) => {
   else if (req.is('application/xml')) {
     req.body = await parseXML(req.body);
   }
+  else if (req.is('application/x-www-form-urlencoded')) {
+    const qs = require('qs');
+    req.body = qs.parse(req.body);
+  }
+
   next();
 });
 
-app.post('/', upload.any(), (req, res) => {
+app.post('/', (req, res) => {
   res.format({
     'application/json': () => {
       res.send(stringifyJSON(req.body));
     },
 
     'application/xml': () => {
+      console.log('hello');
       res.send(stringifyXML(req.body));
     },
 
@@ -69,21 +70,8 @@ app.post('/', upload.any(), (req, res) => {
     'default': () => {
       // log the request and respond with 406
       res.status(406).send('Not Acceptable');
-    }
+    },
   });
 });
 
 module.exports.handler = serverless(app);
-
-// async function hello(event, context) {
-//   return {
-//     statusCode: 200,
-//     body: JSON.stringify({
-//       message: 'Go Serverless v1.0! Your function executed successfully!',
-//       input: event,
-//     }),
-//   };
-
-//   // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-//   // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
-// }
