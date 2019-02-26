@@ -6,7 +6,7 @@ exports.stringifyJSON = function stringifyJSON(obj) {
     return JSON.stringify(obj, null, 2);
 }
 
-exports.parseJSON = function parseJS(stream) {
+exports.parseJSON = function parseJSON(stream) {
     return JSON.parse(stream);
 }
 
@@ -56,3 +56,28 @@ exports.stringifyXML = function stringifyXML(obj) {
     return builder.buildObject(obj);
 }
 
+exports.parseCSV = async function parseCSV(stream) {
+    const neatCSV = require('neat-csv');
+    return (await neatCSV(stream, {
+        mapHeaders: ({ header }) => header.trim().toLowerCase(),
+        mapValues: ({ value }) => isNaN(value) ? value : Number(value),
+    })).map(row => ({ ...row }));
+}
+
+exports.stringifyCSV = function stringifyCSV(obj) {
+    const json2csv = require('json2csv').parse;
+    return json2csv(obj, {
+        flatten: true,
+        // quote: '',
+    });
+}
+
+exports.parseURL = function parseURL(stream) {
+    const qs = require('qs');
+    return qs.parse(stream);
+}
+
+exports.stringifyURL = function stringifyURL(obj) {
+    const qs = require('qs');
+    return qs.stringify(obj);
+}
