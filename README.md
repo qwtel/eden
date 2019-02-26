@@ -29,13 +29,12 @@ plugins:
 
 to 
 
-
-```edn
-{"service" "eden",
- "provider" {"name" "aws", "runtime" "nodejs8.10"},
- "functions"
- {"eden"
-  {"handler" "index.handler",
-   "events" [{"http" "POST /"} {"http" "POST {proxy+}"}]}},
- "plugins" ["serverless-offline"]}
+```clj
+{:service "eden",
+ :provider {:name "aws", :runtime "nodejs8.10"},
+ :functions
+ {:eden
+  {:handler "index.handler",
+   :events [{:http "POST /"} {:http "POST {proxy+}"}]}},
+ :plugins ["serverless-offline"]}
 ```

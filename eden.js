@@ -21,15 +21,14 @@ exports.stringifyTOML = function stringifyTOML(obj) {
 }
 
 exports.parseEDN = function parseEDN(stream) {
-    const edn = require('jsedn');
     const raw = stream.toString('utf8');
-    return edn.toJS(edn.parse(raw));
+    const { read_edn } = require('./pprint/main.js').pprint.core;
+    return read_edn(raw);
 }
 
 exports.stringifyEDN = function stringifyEDN(obj) {
-    const edn = require('jsedn');
-    const pprint = require('./pprint/main.js').pprint.core.pprint;
-    return pprint(edn.encode(obj));
+    const { write_edn } = require('./pprint/main.js').pprint.core;
+    return write_edn(obj);
 }
 
 exports.parseYAML = function parseYAML(stream) {
