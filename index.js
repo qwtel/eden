@@ -43,7 +43,8 @@ app.post('/', upload.any(), (req, res) => {
 
     'application/edn': () => {
       const edn = require('jsedn');
-      res.send(edn.encode(req.body));
+      const pprint = require('./pprint/main.js').pprint.core.pprint;
+      res.send(pprint(edn.encode(req.body)));
     },
 
     'application/x-www-form-urlencoded': () => {
