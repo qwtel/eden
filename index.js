@@ -12,16 +12,23 @@ const log = process.env.DEBUG ? console.log.bind(console) : _ => _;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(xmlParser);
 app.use(yamlParser);
 app.use(tomlParser);
 app.use(ednParser);
 
 app.post('/', upload.any(), (req, res) => {
   log(req.body);
+
   res.format({
     'application/json': () => {
-      log(req.files);
-      res.send(req.body);
+      res.send(JSON.stringify(req.body, null, 2));
+    },
+
+    'application/xml': () => {
+      const { Builder } = require('xml2js');
+      const builder = new Builder();
+      res.send(builder.buildObject(req.body));
     },
 
     'application/yaml': () => {
@@ -50,6 +57,22 @@ app.post('/', upload.any(), (req, res) => {
     }
   });
 });
+
+function xmlParser(req, _, next) {
+  if (req.is('application/xml')) {
+    const { parseString } = require('xml2js');
+    parseString(req.body, {
+      explicitRoot: false,
+      explicitArray: false,
+    }, (err, result) => {
+      // TODO: error
+      req.body = result;
+      next();
+    });
+  } else {
+    next();
+  }
+}
 
 function tomlParser(req, _, next) {
   if (req.is('application/toml')) {
