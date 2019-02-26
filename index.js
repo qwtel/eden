@@ -5,46 +5,60 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 
+const {
+  parseJSON, stringifyJSON,
+  parseXML, stringifyXML,
+  parseTOML, stringifyTOML,
+  parseYAML, stringifyYAML,
+  parseEDN, stringifyEDN,
+} = require('./eden.js');
+
 const app = express();
 const upload = multer();
 
 const log = process.env.DEBUG ? console.log.bind(console) : _ => _;
 
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(xmlParser);
-app.use(yamlParser);
-app.use(tomlParser);
-app.use(ednParser);
+
+app.use(async (req, _, next) => {
+  if (req.is('application/json')) {
+    req.body = await parseJSON(req.body);
+  }
+  else if (req.is('application/toml')) {
+    req.body = await parseTOML(req.body);
+  }
+  else if (req.is('application/edn')) {
+    req.body = await parseEDN(req.body);
+  }
+  else if (req.is('application/yaml')) {
+    req.body = await parseYAML(req.body);
+  }
+  else if (req.is('application/xml')) {
+    req.body = await parseXML(req.body);
+  }
+  next();
+});
 
 app.post('/', upload.any(), (req, res) => {
-  log(req.body);
-
   res.format({
     'application/json': () => {
-      res.send(JSON.stringify(req.body, null, 2));
+      res.send(stringifyJSON(req.body));
     },
 
     'application/xml': () => {
-      const { Builder } = require('xml2js');
-      const builder = new Builder();
-      res.send(builder.buildObject(req.body));
+      res.send(stringifyXML(req.body));
     },
 
     'application/yaml': () => {
-      const yaml = require('js-yaml');
-      res.send(yaml.safeDump(req.body));
+      res.send(stringifyYAML(req.body));
     },
 
     'application/toml': () => {
-      const toml = require('@iarna/toml');
-      res.send(toml.stringify(req.body));
+      res.send(stringifyTOML(req.body));
     },
 
     'application/edn': () => {
-      const edn = require('jsedn');
-      const pprint = require('./pprint/main.js').pprint.core.pprint;
-      res.send(pprint(edn.encode(req.body)));
+      res.send(stringifyEDN(req.body));
     },
 
     'application/x-www-form-urlencoded': () => {
@@ -52,53 +66,12 @@ app.post('/', upload.any(), (req, res) => {
       res.send(qs.stringify(req.body));
     },
 
-    'default': () =>  {
+    'default': () => {
       // log the request and respond with 406
       res.status(406).send('Not Acceptable');
     }
   });
 });
-
-function xmlParser(req, _, next) {
-  if (req.is('application/xml')) {
-    const { parseString } = require('xml2js');
-    parseString(req.body, {
-      explicitRoot: false,
-      explicitArray: false,
-    }, (err, result) => {
-      // TODO: error
-      req.body = result;
-      next();
-    });
-  } else {
-    next();
-  }
-}
-
-function tomlParser(req, _, next) {
-  if (req.is('application/toml')) {
-    const toml = require('@iarna/toml');
-    req.body = toml.parse(req.body);
-  }
-  next();
-}
-
-function ednParser(req, _, next) {
-  if (req.is('application/edn')) {
-      const edn = require('jsedn');
-      const raw = req.body.toString('utf8'); // detect format!?
-      req.body = edn.toJS(edn.parse(raw));
-  }
-  next();
-}
-
-function yamlParser(req, _, next) {
-  if (req.is('application/yaml')) {
-      const yaml = require('js-yaml');
-      req.body = yaml.safeLoad(req.body);
-  }
-  next();
-}
 
 module.exports.handler = serverless(app);
 
