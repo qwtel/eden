@@ -1,4 +1,5 @@
 # Eden
+
 > Data is Bliss
 
 Simple data conversion service to and from common data formats, such as JSON, YAML, TOML, EDN, etc.
@@ -38,3 +39,10 @@ to
    :events [{:http "POST /"} {:http "POST {proxy+}"}]}},
  :plugins ["serverless-offline"]}
 ```
+
+
+## CLI
+Comes with a minimal CLI
+
+    eden serverless.yml -t edn > serverless.edn
+    eden serverless.edn -t toml > serverless.toml

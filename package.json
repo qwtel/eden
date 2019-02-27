@@ -2,7 +2,10 @@
   "name": "eden",
   "version": "1.0.0",
   "description": "",
-  "main": "handler.js",
+  "main": "index.js",
+  "bin": {
+    "eden": "cli.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,6 +16,7 @@
     "express": "^4.16.4",
     "js-yaml": "^3.12.1",
     "json2csv": "^4.3.5",
+    "minimist": "^1.2.0",
     "neat-csv": "^4.0.0",
     "qs": "^6.6.0",
     "serverless-http": "^1.9.1",
