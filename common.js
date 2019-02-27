@@ -5,5 +5,11 @@ module.exports = {
             .on('data', data => (input = Buffer.concat([input, data])))
             .on('end', () => resolve(input.toString(encoding)))
         );
-    }
+    },
+
+    fromEntries(entries) {
+        let obj = Object.create(null);
+        for (let [k,v] of entries) obj[k] = v;
+        return obj;
+    },
 };

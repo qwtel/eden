@@ -2,13 +2,12 @@
 
 > Data is Bliss
 
-Simple data conversion service to and from common data formats, such as JSON, YAML, TOML, EDN, etc.
+Simple data conversion API to and from common data formats, such as JSON, YAML, TOML, EDN, etc.
 
 ## Usage
-Eden uses standard HTTP headers for content negotiation. `Accept` defines the return format, while `Content-Type` specifics the source format. E.g.:
 
 ```bash
-curl -H "Content-Type: application/yaml" --data-binary "@serverless.yml" -H "Accept: application/edn" https://2drrpzm6i9.execute-api.us-east-1.amazonaws.com/dev
+curl --data-binary "@serverless.yml" https://2drrpzm6i9.execute-api.us-east-1.amazonaws.com/dev?from=yaml&to=edn
 ```
 
 Converts from:
@@ -40,9 +39,32 @@ to
  :plugins ["serverless-offline"]}
 ```
 
+It also supports standard HTTP headers for content negotiation. `Accept` defines the return format, while `Content-Type` specifics the source format:
+
+```bash
+curl --data-binary "@serverless.yml" -H "Content-Type: application/yaml" -H "Accept: application/edn" https://2drrpzm6i9.execute-api.us-east-1.amazonaws.com/dev
+```
 
 ## CLI
-Comes with a minimal CLI
+Comes with a minimal CLI:
 
     eden serverless.yml -t edn > serverless.edn
-    eden serverless.edn -t toml > serverless.toml
+
+Or via standard input
+
+    cat serverless.yml | eden -f yaml -t edn > serverless.edn
+
+## API
+### Parameters (Alias)
+
+* `parse` (`p`, `from`, `f`)
+* `stringify` (`s`, `to`, `t`)
+
+### Supported Formats
+* `json` (`js`)
+* `yaml` (`yml`)
+* `toml`
+* `edn`
+* `csv`
+* `xml`
+* `url`

@@ -4,7 +4,7 @@ const minimist = require('minimist');
 const { extname } = require('path');
 const { readFile } = require('fs').promises;
 
-const cv = require('./eden.js');
+const eden = require('./eden.js');
 const { readStream } = require('./common.js');
 
 const argv = minimist(process.argv.slice(2), {
@@ -27,18 +27,6 @@ const ext2Format = {
     '.json': 'JSON',
 };
 
-const format2F = {
-    YAML: [cv.parseYAML, cv.stringifyYAML],
-    YML: [cv.parseYAML, cv.stringifyYAML],
-    EDN: [cv.parseEDN, cv.stringifyEDN],
-    TOML: [cv.parseTOML, cv.stringifyTOML],
-    CSV: [cv.parseCSV, cv.stringifyCSV],
-    XML: [cv.parseXML, cv.stringifyXML],
-    JSON: [cv.parseJSON, cv.stringifyJSON],
-    JS: [cv.parseJSON, cv.stringifyJSON],
-    URL: [cv.parseURL, cv.stringifyURL],
-};
-
 (async () => {
     const [file] = argv._;
 
@@ -53,8 +41,8 @@ const format2F = {
         target = argv.stringify;
     }
 
-    const [parse] = format2F[source.toUpperCase()];
-    const [, stringify] = format2F[target.toUpperCase()];
+    const [parse] = eden.parsers[source.toLowerCase()];
+    const [, stringify] = eden.stringifiers[target.toLowerCase()];
 
     const result = stringify(await parse(content));
 
