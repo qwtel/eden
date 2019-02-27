@@ -39,12 +39,12 @@ app.use(async (req, _, next) => {
   const source = (req.query.parse || req.query.p || req.query.from || req.query.f || '').toLowerCase();
 
   if (source) {
-    if (!parsers[source]) throw Error('not supported');
     req.body = await parsers[source](body);
   } else {
     for (const [mimeType, format] of mimeType2Format) {
       if (req.is(mimeType)) {
         req.body = await parsers[format](body);
+        break;
       }
     }
   }
@@ -56,7 +56,6 @@ app.post('/', (req, res) => {
   const target = (req.query.stringify || req.query.s || req.query.to || req.query.t || '').toLowerCase();
 
   if (target) {
-    if (!stringifiers[target]) throw Error('not supported');
     res.set('content-type', format2MIMEType[target]);
     res.send(stringifiers[target](req.body));
   } else {
