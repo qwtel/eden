@@ -1,6 +1,9 @@
 'use strict';
 
-const serverless = require('serverless-http');
+const server = process.env._HANDLER 
+  ? require('serverless-http')
+  : app => require('http').createServer(app).listen(process.env.PORT || 3000);
+
 const express = require('express');
 
 const {
@@ -13,31 +16,33 @@ const {
   parseURL, stringifyURL,
 } = require('./eden.js');
 
+const { readStream } = require('./common');
+
 const app = express();
 
-const log = process.env.DEBUG ? console.log.bind(console) : _ => _;
-
 app.use(async (req, _, next) => {
+  const body = await readStream(req);
+
   if (req.is('application/json')) {
-    req.body = parseJSON(req.body);
+    req.body = parseJSON(body);
   }
   else if (req.is('application/toml')) {
-    req.body = parseTOML(req.body);
+    req.body = parseTOML(body);
   }
   else if (req.is('application/edn')) {
-    req.body = parseEDN(req.body);
+    req.body = parseEDN(body);
   }
   else if (req.is('application/yaml')) {
-    req.body = parseYAML(req.body);
+    req.body = parseYAML(body);
   }
   else if (req.is('application/xml')) {
-    req.body = await parseXML(req.body);
+    req.body = await parseXML(body);
   }
   else if (req.is('text/csv')) {
-    req.body = await parseCSV(req.body);
+    req.body = await parseCSV(body);
   }
   else if (req.is('application/x-www-form-urlencoded')) {
-    req.body = parseURL(req.body);
+    req.body = parseURL(body);
   }
 
   next();
@@ -80,4 +85,4 @@ app.post('/', (req, res) => {
   });
 });
 
-module.exports.handler = serverless(app);
+module.exports.handler = server(app);
