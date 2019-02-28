@@ -7,10 +7,11 @@ const { promisify } = require('util');
 //   : app => require('http').createServer(app).listen(process.env.PORT || 3000);
 const server = require('serverless-http');
 const express = require('express');
+const cors = require('cors');
 const request = promisify(require('request'));
 
 const { parsers, stringifiers } = require('./eden.js');
-const { readStream } = require('./common');
+// const { readStream } = require('./common');
 
 const app = express();
 
@@ -35,6 +36,8 @@ const mimeType2Format = new Map(Object.entries({
   'application/json': 'json',
   'application/x-www-form-urlencoded': 'url',
 }));
+
+app.use(cors())
 
 app.use((req, _, next) => {
   // TODO: Would be nice to have a yargs/minimist type library for query parameters

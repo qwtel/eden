@@ -25,8 +25,14 @@ functions:
   eden:
     handler: index.handler
     events:
-      - http: POST /
-      - http: ANY /fetch
+      - http: 
+          method: POST
+          path: /
+          cors: true
+      - http: 
+          method: ANY 
+          path: /fetch
+          cors: true
       - http: 'POST {proxy+}'
 
 plugins:
