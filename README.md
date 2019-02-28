@@ -7,7 +7,7 @@ Simple data conversion API to and from common data formats, such as JSON, YAML, 
 ## Usage
 
 ```bash
-curl --data-binary "@serverless.yml" https://2drrpzm6i9.execute-api.us-east-1.amazonaws.com/dev?from=yaml&to=edn
+curl --data-binary "@serverless.yml" "https://2drrpzm6i9.execute-api.us-east-1.amazonaws.com/dev?from=yaml&to=edn"
 ```
 
 Converts from:
