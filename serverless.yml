@@ -26,6 +26,7 @@ functions:
     handler: index.handler
     events:
       - http: POST /
+      - http: ANY /fetch
       - http: 'POST {proxy+}'
 
 plugins:

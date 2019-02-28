@@ -42,7 +42,7 @@ const ext2Format = {
     }
 
     const parse = eden.parsers[source.toLowerCase()];
-    const stringify = eden.stringifiers[target.toLowerCase()];
+    const stringify = await eden.stringifiers[target.toLowerCase()];
 
     const result = stringify(await parse(content));
 
