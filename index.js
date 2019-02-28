@@ -100,7 +100,7 @@ app.all('/fetch', async (req, res) => {
     // TODO: allow separate format for body e.g. TOML -> JSON -> EDN
     const obj = await parsers[res.edenFormat](req.body);
     body = await stringifiers[req.edenFormat](obj);
-    headers['content-type'] = format2MIMEType[req.edenFormat];
+    // headers['content-type'] = format2MIMEType[req.edenFormat];
   }
 
   console.log(body);
