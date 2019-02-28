@@ -86,12 +86,13 @@ app.all('/fetch', async (req, res) => {
     method,
     query: { url },
     // Remove problematic headers;
-    headers: { 
-      host, 
-      connection, 
-      'accept-encoding': _, 
-      ...headers 
-    },
+    // FIXME: handling headers is too damn hard...
+    // headers: { 
+    //   host, 
+    //   connection, 
+    //   'accept-encoding': _, 
+    //   ...headers 
+    // },
   } = req;
 
   let body = null;
@@ -99,24 +100,28 @@ app.all('/fetch', async (req, res) => {
     // TODO: allow separate format for body e.g. TOML -> JSON -> EDN
     const obj = await parsers[res.edenFormat](req.body);
     body = await stringifiers[req.edenFormat](obj);
+    headers['content-type'] = format2MIMEType[req.edenFormat];
   }
 
-  const response = await request({ url, method, headers, body });
+  console.log(body);
+
+  const response = await request({ url, method, /* headers, */ body });
 
   const { 
     // Remove unwanted headers
-    headers: { 
-      'content-type': __,
-      'content-length': ___,
-      'transfer-encoding': ____, 
-      ...headers2 
-    }, 
+    // FIXME: handling headers is too damn hard...
+    // headers: { 
+    //   'content-type': __,
+    //   'content-length': ___,
+    //   'transfer-encoding': ____, 
+    //   ...headers2 
+    // }, 
     body: body2, 
   } = response;
 
   const obj2 = await parsers[req.edenFormat](body2);
   const str2 = await stringifiers[res.edenFormat](obj2);
-  res.set(headers2);
+  // res.set(headers2);
   res.send(str2);
 });
 
