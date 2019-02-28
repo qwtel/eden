@@ -45,6 +45,23 @@ It also supports standard HTTP headers for content negotiation. `Accept` defines
 curl --data-binary "@serverless.yml" -H "Content-Type: application/yaml" -H "Accept: application/edn" https://2drrpzm6i9.execute-api.us-east-1.amazonaws.com/dev
 ```
 
+## Proxy
+
+Eden can call other APIs and return their result in any format:
+
+```js
+const EDEN = 'https://2drrpzm6i9.execute-api.us-east-1.amazonaws.com/dev';
+const url = encodeURIComponent('https://jsonplaceholder.typicode.com/todos/1');
+
+fetch(`${EDEN}/fetch?url=${url}&from=json&to=edn`)
+  .then(response => response.text())
+  .then(text => console.log(text));
+```
+
+```clj
+{:userId 1, :id 1, :title "delectus aut autem", :completed false}
+```
+
 ## CLI
 Comes with a minimal CLI:
 
